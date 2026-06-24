@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>P-FA-II 전사문 프롬프트 생성기</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <div class="badge">CLINICAL PROMPT TOOL</div>
+      <h1>P-FA-II 전사문 프롬프트 생성기</h1>
+      <p>P-FA-II 채점 기준을 반영한 말더듬 발화 전사문 생성용 프롬프트를 조건 선택만으로 만들어 보세요.</p>
+    </header>
+
+    <section class="app-shell">
+      <aside class="panel control-panel">
+        <div class="section-title"><span>1</span>프롬프트 조건 설정</div>
+
+        <div class="field">
+          <label>사용 모드</label>
+          <div class="segmented" data-name="mode">
+            <button class="active" data-value="easy">간편 모드</button>
+            <button data-value="expert">전문가 모드</button>
+          </div>
+          <small>간편 모드는 연령과 심한 정도에 따라 추천값이 자동 적용돼요.</small>
+        </div>
+
+        <div class="field">
+          <label>대상 연령</label>
+          <div class="chips" data-name="age">
+            <button class="active" data-value="취학 전 아동">취학 전 아동</button>
+            <button data-value="초등학생">초등학생</button>
+            <button data-value="중학생 이상">중학생 이상</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>과제 유형</label>
+          <div class="chips" data-name="task">
+            <button class="active" data-value="말하기 그림">말하기 그림</button>
+            <button data-value="이야기 그림">이야기 그림</button>
+            <button data-value="독백">독백</button>
+            <button data-value="대화">대화</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>말더듬 심한 정도</label>
+          <div class="segmented" data-name="severity">
+            <button data-value="약함">약함</button>
+            <button class="active" data-value="중간">중간</button>
+            <button data-value="심함">심함</button>
+          </div>
+        </div>
+
+        <div class="field expert-field">
+          <label for="syllables">목표 음절 수 <em id="syllableText">150</em></label>
+          <input id="syllables" type="range" min="100" max="200" step="10" value="150" />
+        </div>
+
+        <div class="field expert-field">
+          <label for="ratio">ND : AD 비율 <em id="ratioText">4 : 6</em></label>
+          <input id="ratio" type="range" min="3" max="7" step="1" value="4" />
+          <div class="range-guide"><span>AD 많음</span><span>ND 많음</span></div>
+        </div>
+
+        <div class="field expert-field">
+          <label>핵심행동 AD 유형</label>
+          <div class="checks">
+            <label><input type="checkbox" value="연장" checked /> 연장</label>
+            <label><input type="checkbox" value="막힘" checked /> 막힘</label>
+            <label><input type="checkbox" value="1음절 반복(R2)" checked /> 1음절 반복</label>
+            <label><input type="checkbox" value="음소 반복" /> 음소 반복</label>
+            <label><input type="checkbox" value="긴장 동반 주저(Ha)" checked /> 긴장 주저</label>
+            <label><input type="checkbox" value="반복 간투사(Ia)" /> 반복 간투사</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="behavior">부수행동</label>
+          <input id="behavior" type="text" placeholder="예: 눈 깜빡임, 입술 긴장, 고개 젖힘" />
+        </div>
+
+        <div class="field">
+          <label>함정 문항</label>
+          <div class="segmented" data-name="trap">
+            <button class="active" data-value="포함해 줘">포함</button>
+            <button data-value="포함하지 말아 줘">미포함</button>
+          </div>
+          <small>ND처럼 보이지만 AD로 채점되는 항목 포함 여부</small>
+        </div>
+
+        <div class="field">
+          <label for="scene">장면/주제</label>
+          <input id="scene" type="text" placeholder="예: 놀이터, 공원, 학교생활" />
+        </div>
+
+        <button id="generateBtn" class="primary-btn">✦ 프롬프트 생성</button>
+      </aside>
+
+      <section class="panel result-panel">
+        <div id="emptyState" class="empty-state">
+          <div class="icon">⌘</div>
+          <h2>프롬프트 생성 준비</h2>
+          <p>왼쪽에서 조건을 설정한 뒤<br />프롬프트 생성 버튼을 눌러주세요.</p>
+          <small>P-FA-II 채점 기준 · 연령별 규준 반영 · 실습용 전사문 생성</small>
+        </div>
+
+        <div id="resultState" class="result-state hidden">
+          <div class="result-head">
+            <div>
+              <h2>생성된 프롬프트</h2>
+              <p>복사해서 ChatGPT 또는 사용 중인 AI 도구에 붙여넣으세요.</p>
+            </div>
+            <button id="copyBtn" class="copy-btn">복사</button>
+          </div>
+          <textarea id="promptOutput" spellcheck="false"></textarea>
+          <div class="action-row">
+            <button id="resetBtn" class="secondary-btn">초기화</button>
+            <button id="copyBtnBottom" class="primary-btn small">프롬프트 복사</button>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div id="toast">프롬프트가 복사됐어요.</div>
+  <script src="script.js"></script>
+</body>
+</html>
